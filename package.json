@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "luxon": "^1.17.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.0.1",
-    "serve": "^11.1.0"
+    "react-websocket": "^2.0.1",
+    "serve": "^11.1.0",
+    "uniqid": "^5.0.3"
   },
   "scripts": {
     "dev": "react-scripts start",
