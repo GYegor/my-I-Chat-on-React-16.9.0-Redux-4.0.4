@@ -14,7 +14,7 @@ class SendMessage extends Component {
 
   sendMessage = (e) => {
     const { handleSubmit } = this.props;
-    const message = this.state.value
+    const message = this.state.value;
     e.preventDefault();
     handleSubmit(message);
     this.inputToState('');
@@ -22,7 +22,7 @@ class SendMessage extends Component {
 
   render() {
     return (
-      <form onSubmit={this.sendMessage}>
+      <form className="message-form" onSubmit={this.sendMessage}>
           <input type="text" placeholder="Введите сообщение" value={this.state.value} onChange={e => this.inputToState(e.target.value)} />
         {/* <input type="submit" value="Отправить" /> */}
       </form>
