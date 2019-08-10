@@ -74,7 +74,8 @@ li {
 }
 
 .message-body {
-  word-break: break-all;
+  /* word-break: break-all; */
+
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -117,3 +118,12 @@ input:focus::-webkit-input-placeholder {
 }
 
 
+@media screen and (max-width: 600px) {
+  .main {
+    width: 100%;
+  }
+
+  input {
+    width: calc(100% - 20px);
+  }
+}
