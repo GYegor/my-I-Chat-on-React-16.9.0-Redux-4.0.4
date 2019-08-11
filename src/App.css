@@ -80,16 +80,24 @@ li {
   margin-bottom: 0;
 }
 
+.sign-form {
+  z-index: 100;
+  display: inline-block;
+  position: fixed;
+  top: 0px;
+  width: 50%;
+  background-color: rgb(34, 34, 34);
+}
+
 .message-form {
   display: inline-block;
   position: fixed;
   bottom: 0px;
   width: 100%;
-
 }
 
-input {
-  border: 2px solid rgb(143, 168, 238);
+.input-massage {
+  border: 2px solid rgba(82, 82, 82, 0.603);
   background-color: rgb(34, 34, 34);
   box-sizing: border-box;
   margin: 10px;
@@ -104,16 +112,20 @@ input {
   font-weight: 200;
 }
 
-input:focus {
+.input-massage.active {
+  border-color: rgb(143, 168, 238);
+}
+
+.input-massage.active:focus {
   outline: none;
   border-color: #F3CE5D;
 }
 
-input::-webkit-input-placeholder {
+.input-massage.active::-webkit-input-placeholder {
 	font-style: italic;
 }
 
-input:focus::-webkit-input-placeholder {
+.input-massage.active:focus::-webkit-input-placeholder {
 	opacity: 0.2;
 }
 
@@ -123,7 +135,7 @@ input:focus::-webkit-input-placeholder {
     width: 100%;
   }
 
-  input {
+  .input-massage {
     width: calc(100% - 20px);
   }
 }

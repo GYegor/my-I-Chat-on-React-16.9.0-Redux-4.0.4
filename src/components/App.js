@@ -2,13 +2,17 @@ import React, {Component} from 'react';
 // import Websocket from 'react-websocket';
 import MessageList from "./MessageList";
 import SendMessage from "./SendMessage";
-import './App.css';
+import SignForm from "./SignForm";
+import '../App.css';
 
 class App extends Component {
   constructor() {
     super();
+    this.cachedName = localStorage.getItem("loggedAs") ? JSON.parse(localStorage.getItem("loggedAs")) : false;
     this.state = {
       ws: new WebSocket('ws://st-chat.shas.tel'),
+      userName: this.cachedName.userName,
+      isUserSigned: this.cachedName.isUserSigned,
       result: [],
       inputMessage: ''
     };
@@ -26,18 +30,12 @@ class App extends Component {
   sendMessage = (message) => {
     let websocket = this.state.ws;
     const messageObject = {
-      from: 'GY',
+      from: this.state.userName,
       message: message
     }
     websocket.send(JSON.stringify(messageObject));
     console.log(JSON.stringify(messageObject));
   }
-
-
-  handleSubmit = (message) => {
-    this.sendMessage(message);
-  }
-
 
   componentDidMount() {
     this.getMessage();
@@ -49,19 +47,27 @@ class App extends Component {
     window.scrollTo(0, document.body.scrollHeight);
   }
 
-  handleData = (data) => {
-    let newData = JSON.parse(data);
-    console.log(newData);
-    // console.log(newDta);
-  }
 
+  handleNickname = (text = '') => {
+    let nameData = JSON.stringify({
+      userName: text,
+      isUserSigned: text.length > 0? true : false,
+    });
+    localStorage.setItem("loggedAs", nameData);
+    this.setState({
+      userName: text,
+      isUserSigned: text.length > 0? true : false,
+    });
+  }
+  
 
   render() {
+    console.log(this.state.isUserSigned);
     return (
     <div className="main">
-      <MessageList data={this.state.result}  />
-      {/* <Websocket url='ws://st-chat.shas.tel' onMessage={this.handleData} /> */}
-      <SendMessage handleSubmit={this.handleSubmit} />
+      <SignForm handleNickname={this.handleNickname} isUserSigned={this.state.isUserSigned} userName={this.state.userName}/>
+      <MessageList messageArr={this.state.result}  />
+      <SendMessage handleSubmit={this.sendMessage} isUserSigned={this.state.isUserSigned} />
     </div>
     );
   }

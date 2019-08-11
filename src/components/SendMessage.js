@@ -3,7 +3,9 @@ import React, { Component } from 'react';
 class SendMessage extends Component {
   constructor(props) {
     super(props);
-    this.state = {value: ''};
+    this.state = {
+      value: ''
+    };
   }
 
   inputToState = (text) => {
@@ -21,10 +23,17 @@ class SendMessage extends Component {
   }
 
   render() {
+    const { isUserSigned } = this.props;
+    const inputActive = (
+      <input className="input-massage active" type="text" placeholder="Write you message" value={this.state.value} onChange={e => this.inputToState(e.target.value)} />
+    )
+    const inputInactive = (
+      <div className="input-massage inctive"></div>
+    )
+
     return (
       <form className="message-form" onSubmit={this.sendMessage}>
-          <input type="text" placeholder="Введите сообщение" value={this.state.value} onChange={e => this.inputToState(e.target.value)} />
-        {/* <input type="submit" value="Отправить" /> */}
+        {isUserSigned ? inputActive : inputInactive}
       </form>
     );
   }

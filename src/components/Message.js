@@ -1,8 +1,8 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { DateTime } from 'luxon';
 
 
-class Message extends PureComponent {
+class Message extends Component {
 
   // shouldComponentUpdate(nextProps) {
   //   console.log(this.props.message.id, nextProps.message.id);
@@ -13,7 +13,7 @@ class Message extends PureComponent {
   }
 
   setTimeString = (millisecs) => {
-    let { year, month, day, hour, minute, second} = DateTime.fromMillis(millisecs).c;
+    let { year, month, day, hour, minute } = DateTime.fromMillis(millisecs).c;
     const timeString = `${this.toTwoFigStr(day)}.${this.toTwoFigStr(month)}.${year} ${this.toTwoFigStr(hour)}:${this.toTwoFigStr(minute)}`;
     return timeString;
   }
