@@ -7,7 +7,7 @@ class MessageList extends Component {
     const { messageArr } = this.props;
 
     if (messageArr) {
-      list = messageArr.map(message => {console.log(message.id); return (<Message key={message.id} message={message}/>); });
+      list = messageArr.map(message => (<Message key={message.id} message={message}/>));
     }
 
     return (

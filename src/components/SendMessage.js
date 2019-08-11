@@ -15,10 +15,11 @@ class SendMessage extends Component {
   }
 
   sendMessage = (e) => {
-    const { handleSubmit } = this.props;
+    const { handleSubmit, connectionStatus, cacheMessage } = this.props;
     const message = this.state.value;
     e.preventDefault();
-    handleSubmit(message);
+    console.log(connectionStatus);
+    connectionStatus === 1 ? handleSubmit(message) : cacheMessage(message);
     this.inputToState('');
   }
 

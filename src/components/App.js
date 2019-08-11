@@ -3,6 +3,11 @@ import React, {Component} from 'react';
 import MessageList from "./MessageList";
 import SendMessage from "./SendMessage";
 import SignForm from "./SignForm";
+import customDateString from "../utils/customDateString"
+
+
+import ConnectionStatus from "./ConnectionStatus";
+
 import '../App.css';
 
 class App extends Component {
@@ -14,38 +19,74 @@ class App extends Component {
       userName: this.cachedName.userName,
       isUserSigned: this.cachedName.isUserSigned,
       result: [],
-      inputMessage: ''
+      connectionStatus: 3,
     };
+  }
+
+  componentDidMount() {
+    this.updateConnectionStatus()
+    this.getMessage();
+  }
+
+  componentDidUpdate() {
+    this.updateConnectionStatus()
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
   getMessage = () => {
     const websocket = this.state.ws;
     websocket.onmessage = (e) => {
-    const newData = JSON.parse(e.data)
+      const newData = JSON.parse(e.data)
       newData.reverse();
       this.setState( (prevState) => {return {result: [...prevState.result,...newData]};});
     }
   }
 
-  sendMessage = (message) => {
+  updateConnectionStatus = () => {
+    const websocket = this.state.ws;
+    websocket.onopen = () => {
+      this.setState({
+        connectionStatus: websocket.readyState,
+      });
+      if (localStorage.getItem("offlineMessages")) {
+        const offlineArr = JSON.parse(localStorage.getItem("offlineMessages"));
+        offlineArr.forEach( message => {websocket.send(JSON.stringify(message));})
+        localStorage.removeItem("offlineMessages");
+      }
+    }
+    websocket.onclose = () => {
+      this.setState({
+        connectionStatus: websocket.readyState,
+      });
+    }
+    // check();
+  };
+
+
+  handleSubmit = (message) => {
     let websocket = this.state.ws;
     const messageObject = {
       from: this.state.userName,
       message: message
     }
     websocket.send(JSON.stringify(messageObject));
-    console.log(JSON.stringify(messageObject));
   }
 
-  componentDidMount() {
-    this.getMessage();
-  }
-
-
-  componentDidUpdate() {
-    // this.onMessage();
-    window.scrollTo(0, document.body.scrollHeight);
-  }
+  cacheMessage = (message) => {
+    if (!localStorage.getItem("offlineMessages")) {
+      localStorage.setItem("offlineMessages", JSON.stringify([]));
+    }
+    let millisecs = (new Date()).getTime();
+    let cachedDate = customDateString(millisecs);
+    let missedMessage = {
+      from: `${this.state.userName} (missed ${cachedDate})`,
+      message: message
+    }
+    let cachedMessageArr = JSON.parse(localStorage.getItem("offlineMessages"));
+    console.log(cachedMessageArr);
+    cachedMessageArr.push(missedMessage);
+    localStorage.setItem("offlineMessages", JSON.stringify(cachedMessageArr));
+   }
 
 
   handleNickname = (text = '') => {
@@ -59,15 +100,15 @@ class App extends Component {
       isUserSigned: text.length > 0? true : false,
     });
   }
-  
+
 
   render() {
-    console.log(this.state.isUserSigned);
     return (
     <div className="main">
+      {/* <ConnectionStatus connectionStatus={this.state.connectionStatus}/> */}
       <SignForm handleNickname={this.handleNickname} isUserSigned={this.state.isUserSigned} userName={this.state.userName}/>
       <MessageList messageArr={this.state.result}  />
-      <SendMessage handleSubmit={this.sendMessage} isUserSigned={this.state.isUserSigned} />
+      <SendMessage connectionStatus={this.state.connectionStatus} handleSubmit={this.handleSubmit} cacheMessage={this.cacheMessage} isUserSigned={this.state.isUserSigned} />
     </div>
     );
   }
