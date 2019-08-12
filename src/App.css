@@ -129,6 +129,15 @@ li {
 	opacity: 0.2;
 }
 
+.connection-status {
+  display: inline-block;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 5rem;
+  /* height:  */
+}
+
 
 @media screen and (max-width: 600px) {
   .main {

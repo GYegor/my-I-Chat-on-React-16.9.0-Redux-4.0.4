@@ -18,7 +18,6 @@ class SendMessage extends Component {
     const { handleSubmit, connectionStatus, cacheMessage } = this.props;
     const message = this.state.value;
     e.preventDefault();
-    console.log(connectionStatus);
     connectionStatus === 1 ? handleSubmit(message) : cacheMessage(message);
     this.inputToState('');
   }

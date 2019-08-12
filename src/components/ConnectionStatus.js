@@ -1,9 +1,8 @@
 import React from 'react';
 
 const ConnectionStatus = ({ connectionStatus }) => {
-  console.log(connectionStatus);
   return (
-    <div>
+    <div className="connection-status">
       {connectionStatus}
     </div>
   )
