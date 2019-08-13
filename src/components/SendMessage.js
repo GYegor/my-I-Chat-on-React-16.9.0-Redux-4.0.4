@@ -14,11 +14,11 @@ class SendMessage extends Component {
     });
   }
 
-  sendMessage = (e) => {
-    const { handleSubmit, connectionStatus, cacheMessage } = this.props;
+  handleMessage = (e) => {
+    const { sendMessage, connectionStatus, cacheMessage } = this.props;
     const message = this.state.value;
     e.preventDefault();
-    connectionStatus === 1 ? handleSubmit(message) : cacheMessage(message);
+    connectionStatus === 1 ? sendMessage(message) : cacheMessage(message);
     this.inputToState('');
   }
 
@@ -32,7 +32,7 @@ class SendMessage extends Component {
     )
 
     return (
-      <form className="message-form" onSubmit={this.sendMessage}>
+      <form className="message-form" onSubmit={this.handleMessage}>
         {isUserSigned ? inputActive : inputInactive}
       </form>
     );

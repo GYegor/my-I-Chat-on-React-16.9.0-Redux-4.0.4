@@ -21,10 +21,23 @@ class App extends Component {
       isUserSigned: this.cachedName.isUserSigned,
       result: [],
       connectionStatus: 3,
+      windowFocused: true
     };
   }
 
   componentDidMount() {
+    // window.scrollTo(0, document.body.scrollHeight);
+    Notification.requestPermission();
+    window.onblur = () => { 
+      this.setState({
+        windowFocused: false
+      });
+    }
+    window.onfocus = () => { 
+      this.setState({
+        windowFocused: true
+      });
+    }
     this.statusHandler()
   }
   
@@ -40,10 +53,24 @@ class App extends Component {
     const websocket = this.state.ws;
     websocket.onmessage = (e) => {
       const newData = JSON.parse(e.data)
+      // console.log(newData[0]);
+      if (!this.state.windowFocused) this.notify(newData[0]);
       newData.reverse();
       this.setState( (prevState) => {return {result: [...prevState.result,...newData]};});
     }
   }
+
+  notify = (newMessage) => {
+    const note = new Notification("RS-i-Chat", {
+      icon: './favicon.ico',
+      body: `${newMessage.from}: "${newMessage.message}" at ${customDateString(newMessage.time)}`
+    });
+    note.onclick = () => {
+      window.open('http://localhost:3000/')
+    }
+    setTimeout( note.close.bind(note), 2000);
+  }
+
 
   statusHandler = () => {
     const websocket = this.state.ws;
@@ -89,7 +116,7 @@ class App extends Component {
   };
   
 
-  handleSubmit = (message) => {
+  sendMessage = (message) => {
     let websocket = this.state.ws;
     const messageObject = {
       from: this.state.userName,
@@ -134,7 +161,7 @@ class App extends Component {
       <ConnectionStatus connectionStatus={this.state.connectionStatus}/>
       <SignForm handleNickname={this.handleNickname} isUserSigned={this.state.isUserSigned} userName={this.state.userName}/>
       <MessageList messageArr={this.state.result}  />
-      <SendMessage connectionStatus={this.state.connectionStatus} handleSubmit={this.handleSubmit} cacheMessage={this.cacheMessage} isUserSigned={this.state.isUserSigned} />
+      <SendMessage connectionStatus={this.state.connectionStatus} sendMessage={this.sendMessage} cacheMessage={this.cacheMessage} isUserSigned={this.state.isUserSigned} />
     </div>
     );
   }
