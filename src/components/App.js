@@ -16,7 +16,7 @@ class App extends Component {
     super();
     this.cachedName = localStorage.getItem("loggedAs") ? JSON.parse(localStorage.getItem("loggedAs")) : false;
     this.state = {
-      ws: new WebSocket('ws://st-chat.shas.tel'),
+      ws: new WebSocket('wss://wssproxy.herokuapp.com/'),
       userName: this.cachedName.userName,
       isUserSigned: this.cachedName.isUserSigned,
       result: [],
@@ -68,7 +68,7 @@ class App extends Component {
     note.onclick = () => {
       window.open('http://localhost:3000/')
     }
-    setTimeout( note.close.bind(note), 2000);
+    setTimeout( note.close.bind(note), 3000);
   }
 
 
@@ -90,7 +90,7 @@ class App extends Component {
     
     
     const handleClose = () => {
-      const rws = new ReconnectingWebSocket('ws://st-chat.shas.tel', [], {connectionTimeout: 5000, maxRetries: 10});
+      const rws = new ReconnectingWebSocket('wss://wssproxy.herokuapp.com/', [], {connectionTimeout: 5000, maxRetries: 10});
       this.setState({
         connectionStatus: websocket.readyState,
         // result: [],
