@@ -6,9 +6,12 @@
     "luxon": "^1.17.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
+    "react-redux": "^7.1.0",
     "react-scripts": "3.0.1",
     "react-websocket": "^2.0.1",
     "reconnecting-websocket": "^4.1.10",
+    "redux": "^4.0.4",
+    "redux-thunk": "^2.3.0",
     "serve": "^11.1.0",
     "uniqid": "^5.0.3"
   },

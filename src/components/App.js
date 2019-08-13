@@ -7,6 +7,7 @@ import SendMessage from "./SendMessage";
 import SignForm from "./SignForm";
 import ConnectionStatus from "./ConnectionStatus";
 
+import { CLOSED } from '../constants/connection-status';
 
 
 import '../App.css';
@@ -14,135 +15,147 @@ import '../App.css';
 class App extends Component {
   constructor() {
     super();
-    this.cachedName = localStorage.getItem("loggedAs") ? JSON.parse(localStorage.getItem("loggedAs")) : false;
+
+    const connection = new WebSocket('ws://st-chat.shas.tel');
+    const connectionReadyState = CLOSED;
+    const userName = localStorage.getItem("loggedAs");  
+    const messages = [];
+    const messageIds = [];
+    const isWindowInactive = false;
+
     this.state = {
-      ws: new WebSocket('wss://wssproxy.herokuapp.com/'),
-      userName: this.cachedName.userName,
-      isUserSigned: this.cachedName.isUserSigned,
-      result: [],
-      connectionStatus: 3,
-      windowFocused: true
+      connection,
+      connectionReadyState,
+      userName,
+      messages,
+      messageIds,
+      isWindowInactive,
     };
   }
 
   componentDidMount() {
     // window.scrollTo(0, document.body.scrollHeight);
     Notification.requestPermission();
-    window.onblur = () => { 
-      this.setState({
-        windowFocused: false
-      });
-    }
-    window.onfocus = () => { 
-      this.setState({
-        windowFocused: true
-      });
-    }
-    this.statusHandler()
-  }
-  
-  componentDidUpdate() {
-    // this.statusHandler()
-    window.scrollTo(0, document.body.scrollHeight);
+    window.onblur = () => this.setState({
+      isWindowInactive: true,
+    });
+    window.onfocus = () => this.setState({
+      isWindowInactive: false,
+    });
+
+    const { connection } = this.state;
+    connection.addEventListener('open', this.onConnecionOpen);
+    connection.addEventListener('close', this.onConnectionClose);
+    connection.addEventListener('message', this.onMessage);
+    // connection.addEventListener('error', this.onConnectionError); 
   }
 
-  getMessage = () => {
-    // this.setState({
-    //   result: [],
-    // });
-    const websocket = this.state.ws;
-    websocket.onmessage = (e) => {
-      const newData = JSON.parse(e.data)
-      // console.log(newData[0]);
-      if (!this.state.windowFocused) this.notify(newData[0]);
-      newData.reverse();
-      this.setState( (prevState) => {return {result: [...prevState.result,...newData]};});
+
+  // componentDidUpdate() {
+  //   // this.statusHandler()
+  //   window.scrollTo(0, document.body.scrollHeight);
+  // }
+
+
+  onConnectionOpen = () => {
+    const { connection } = this.state;
+    const offlineMessages = localStorage.getItem("offlineMessages");
+
+    this.setState({
+      connectionReadyState: connection.readyState,
+    });
+    console.log(this.state.connectionReadyState);
+
+    if (offlineMessages) {
+      connection.send(offlineMessages);
+      localStorage.removeItem("offlineMessages");
     }
+
   }
+
+
+  onConnectionClose = () => {
+    const { connection } = this.state;
+    const rws = new ReconnectingWebSocket('ws://st-chat.shas.tel');
+
+    this.setState({
+      connection: rws,
+      connectionReadyState: connection.readyState,
+    });
+
+    rws.addEventListener('open', this.onConnectionOpen)
+  }
+
+
+
+  onMessage = ({ data }) => {
+    const { messageIds, isWindowInactive } = this.state;
+    const recievedMessages = JSON.parse(data);
+    const newMessages = recievedMessages.filter(message => messageIds.indexOf(message.id) !== -1)
+    const newIds = newMessages.map(message => message.id)
+    const [ lastMessage ] = newMessages;    
+    
+    if (isWindowInactive) {
+      this.notify(lastMessage);
+    }
+
+    // recievedMessages.reverse();
+    this.setState(prevState => ({ 
+      messages: [...prevState.messages, ...newMessages],
+      messageIds: [...prevState.messageIds, ...newIds],
+      }));
+  }
+
+
+
+
+
+
 
   notify = (newMessage) => {
     const note = new Notification("RS-i-Chat", {
       icon: './favicon.ico',
       body: `${newMessage.from}: "${newMessage.message}" at ${customDateString(newMessage.time)}`
     });
+    
     note.onclick = () => {
       window.open('http://localhost:3000/')
     }
-    setTimeout( note.close.bind(note), 3000);
-  }
+
+    // setTimeout(note.close.bind(note), NOTIFICATION_VISIBILITY_TIMEOUT);
+  } 
 
 
-  statusHandler = () => {
-    const websocket = this.state.ws;
-
-    const handleOpen = () => {
-      this.setState({
-        connectionStatus: websocket.readyState,
-        result: [],
-      });
-      if (localStorage.getItem("offlineMessages")) {
-        const offlineArr = JSON.parse(localStorage.getItem("offlineMessages"));
-        offlineArr.forEach( message => {websocket.send(JSON.stringify(message));})
-        localStorage.removeItem("offlineMessages");
-      }
-      this.getMessage();
-    }
-    
-    
-    const handleClose = () => {
-      const rws = new ReconnectingWebSocket('wss://wssproxy.herokuapp.com/', [], {connectionTimeout: 5000, maxRetries: 10});
-      this.setState({
-        connectionStatus: websocket.readyState,
-        // result: [],
-      });
-      // websocket.removeEventListener('open', handleOpen)
-      rws.addEventListener('open', () => {
-        if (localStorage.getItem("offlineMessages")) {
-          const offlineArr = JSON.parse(localStorage.getItem("offlineMessages"));
-          offlineArr.forEach( message => {rws.send(JSON.stringify(message));})
-          localStorage.removeItem("offlineMessages");
-        };
-        this.setState({
-          connectionStatus: rws.readyState,
-          ws: rws,
-          result: [],
-        });
-        this.getMessage();
-      });
-    }
-    
-    websocket.addEventListener('open', handleOpen)
-    websocket.addEventListener('close', handleClose)  
-  };
-  
 
   sendMessage = (message) => {
-    let websocket = this.state.ws;
+    const { connection, userName } = this.state;
     const messageObject = {
-      from: this.state.userName,
+      from: userName,
       message: message
     }
-    websocket.send(JSON.stringify(messageObject));
+    connection.send(JSON.stringify(messageObject));
   }
 
   cacheMessage = (message) => {
-    if (!localStorage.getItem("offlineMessages")) {
-      localStorage.setItem("offlineMessages", JSON.stringify([]));
+    const { userName } = this.state
+    const offlineMessages = localStorage.getItem("offlineMessages");
+    
+    if (!offlineMessages) {
+      const cachedDate = customDateString(Date.now());
+      const firstMissedMessage = {
+        from: `${userName} (missed ${cachedDate})`,
+        message,
+      }
+      localStorage.setItem("offlineMessages", JSON.stringify(firstMissedMessage));
+    } else {
+      const allCachedMessages = JSON.parse(offlineMessages);
+      allCachedMessages.message += `\n ${message}`;
+      localStorage.setItem("offlineMessages", JSON.stringify(allCachedMessages));
     }
-    let millisecs = (new Date()).getTime();
-    let cachedDate = customDateString(millisecs);
-    let missedMessage = {
-      // from: `${this.state.userName} two`,
-      from: `${this.state.userName} (missed ${cachedDate})`,
-      message: message
-    }
-    let cachedMessageArr = JSON.parse(localStorage.getItem("offlineMessages"));
-    cachedMessageArr.push(missedMessage);
-    localStorage.setItem("offlineMessages", JSON.stringify(cachedMessageArr));
-   }
+  }
 
 
-  handleNickname = (text = '') => {
+  handleNickname = (text) => {
     let nameData = JSON.stringify({
       userName: text,
       isUserSigned: text.length > 0? true : false,
@@ -155,16 +168,20 @@ class App extends Component {
   }
 
 
-  render() {
-    return (
+  render = () => (
     <div className="main">
-      <ConnectionStatus connectionStatus={this.state.connectionStatus}/>
+      <ConnectionStatus connectionReadyState={this.state.connectionReadyState}/>
       <SignForm handleNickname={this.handleNickname} isUserSigned={this.state.isUserSigned} userName={this.state.userName}/>
       <MessageList messageArr={this.state.result}  />
-      <SendMessage connectionStatus={this.state.connectionStatus} sendMessage={this.sendMessage} cacheMessage={this.cacheMessage} isUserSigned={this.state.isUserSigned} />
+      <SendMessage
+        connectionStatus
+        sendMessage={this.sendMessage}
+        cacheMessage={this.cacheMessage}
+        isUserSigned={this.state.isUserSigned}
+      />
     </div>
-    );
-  }
+  );
+
 }
 
 export default App;

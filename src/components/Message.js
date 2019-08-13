@@ -22,11 +22,11 @@ class Message extends Component {
   render() {
     const { message } = this.props;
     return (
-  <li>
-    <span className={'name'}>{`${message.from}:   `}</span>
-    <span className={'time'}>{this.setTimeString(message.time)}</span>
-    <p className={'message-body'}>{message.message}</p>
-  </li>
+      <li>
+        <span className={'name'}>{`${message.from}:   `}</span>
+        <span className={'time'}>{this.setTimeString(message.time)}</span>
+        <p className={'message-body'}>{message.message}</p>
+      </li>
     );
   }
 };

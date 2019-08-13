@@ -1,11 +1,9 @@
 import React from 'react';
 
-const ConnectionStatus = ({ connectionStatus }) => {
-  return (
-    <div className="connection-status">
-      {connectionStatus}
-    </div>
-  )
-}
+const ConnectionStatus = ({ connectionReadyState }) => (
+  <div className="connection-status">
+    {connectionReadyState}
+  </div>
+);
 
 export default ConnectionStatus;
