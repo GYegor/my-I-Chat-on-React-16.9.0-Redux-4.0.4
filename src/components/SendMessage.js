@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { OPENED } from '../constants/connection-status';
 
 class SendMessage extends Component {
   constructor(props) {
@@ -15,17 +16,17 @@ class SendMessage extends Component {
   }
 
   handleMessage = (e) => {
-    const { sendMessage, connectionStatus, cacheMessage } = this.props;
+    const { sendMessage, connectionReadyState, cacheMessage } = this.props;
     const message = this.state.value;
     e.preventDefault();
-    connectionStatus === 1
+    connectionReadyState === OPENED
       ? sendMessage(message)
       : cacheMessage(message);
     this.inputToState('');
   }
 
   render() {
-    const { isUserSigned } = this.props;
+    const { userName } = this.props;
     const inputActive = (
       <input className="input-massage active" type="text" placeholder="Write you message" value={this.state.value} onChange={e => this.inputToState(e.target.value)} />
     )
@@ -35,7 +36,7 @@ class SendMessage extends Component {
 
     return (
       <form className="message-form" onSubmit={this.handleMessage}>
-        {isUserSigned ? inputActive : inputInactive}
+        {userName ? inputActive : inputInactive}
       </form>
     );
   }

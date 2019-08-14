@@ -1,2 +1,2 @@
-export const CLOSED = 3;
-export const OPENED = 1;
+export const CLOSED = 'Connection closed! Connecting...';
+export const OPENED = 'Connected';

@@ -7,7 +7,7 @@ import SendMessage from "./SendMessage";
 import SignForm from "./SignForm";
 import ConnectionStatus from "./ConnectionStatus";
 
-import { CLOSED } from '../constants/connection-status';
+import { CLOSED, OPENED } from '../constants/connection-status';
 
 
 import '../App.css';
@@ -44,73 +44,67 @@ class App extends Component {
     });
 
     const { connection } = this.state;
-    connection.addEventListener('open', this.onConnecionOpen);
+    connection.addEventListener('open', this.onConnectionOpen);
     connection.addEventListener('close', this.onConnectionClose);
     connection.addEventListener('message', this.onMessage);
     // connection.addEventListener('error', this.onConnectionError); 
   }
 
 
-  // componentDidUpdate() {
-  //   // this.statusHandler()
-  //   window.scrollTo(0, document.body.scrollHeight);
-  // }
+  componentDidUpdate() {
+    // this.statusHandler()
+    window.scrollTo(0, document.body.scrollHeight);
+  }
 
 
   onConnectionOpen = () => {
     const { connection } = this.state;
-    const offlineMessages = localStorage.getItem("offlineMessages");
-
-    this.setState({
-      connectionReadyState: connection.readyState,
-    });
-    console.log(this.state.connectionReadyState);
-
-    if (offlineMessages) {
+      this.setState({
+        connectionReadyState: OPENED,
+      });
+      
+      const offlineMessages = localStorage.getItem("offlineMessages");
+      if (offlineMessages) {
       connection.send(offlineMessages);
       localStorage.removeItem("offlineMessages");
+      connection.addEventListener('close', this.onConnectionClose);
     }
-
   }
 
 
   onConnectionClose = () => {
-    const { connection } = this.state;
     const rws = new ReconnectingWebSocket('ws://st-chat.shas.tel');
 
     this.setState({
       connection: rws,
-      connectionReadyState: connection.readyState,
+      connectionReadyState: CLOSED,
     });
 
-    rws.addEventListener('open', this.onConnectionOpen)
-  }
+    const { connection } = this.state
+    // rws.addEventListener('close', this.onConnectionClose);
+    connection.addEventListener('open', this.onConnectionOpen);
+    connection.addEventListener('message', this.onMessage);
 
+  }
 
 
   onMessage = ({ data }) => {
     const { messageIds, isWindowInactive } = this.state;
     const recievedMessages = JSON.parse(data);
-    const newMessages = recievedMessages.filter(message => messageIds.indexOf(message.id) !== -1)
+    const newMessages = recievedMessages.filter(message => messageIds.indexOf(message.id) === -1)
     const newIds = newMessages.map(message => message.id)
     const [ lastMessage ] = newMessages;    
-    
-    if (isWindowInactive) {
+    console.log(newMessages);
+    if (isWindowInactive && lastMessage) {
       this.notify(lastMessage);
     }
 
-    // recievedMessages.reverse();
+    newMessages.reverse();
     this.setState(prevState => ({ 
       messages: [...prevState.messages, ...newMessages],
       messageIds: [...prevState.messageIds, ...newIds],
       }));
   }
-
-
-
-
-
-
 
   notify = (newMessage) => {
     const note = new Notification("RS-i-Chat", {
@@ -156,32 +150,36 @@ class App extends Component {
 
 
   handleNickname = (text) => {
-    let nameData = JSON.stringify({
-      userName: text,
-      isUserSigned: text.length > 0? true : false,
-    });
-    localStorage.setItem("loggedAs", nameData);
+    localStorage.setItem("loggedAs", text);
     this.setState({
       userName: text,
-      isUserSigned: text.length > 0? true : false,
     });
   }
 
-
-  render = () => (
+  render = () => {
+    const {
+      connectionReadyState,
+      userName,
+      messages
+    } = this.state;
+    const {
+      sendMessage,
+      cacheMessage,
+      handleNickname
+    } = this;
+    return (
     <div className="main">
-      <ConnectionStatus connectionReadyState={this.state.connectionReadyState}/>
-      <SignForm handleNickname={this.handleNickname} isUserSigned={this.state.isUserSigned} userName={this.state.userName}/>
-      <MessageList messageArr={this.state.result}  />
+      <ConnectionStatus connectionReadyState={connectionReadyState}/>
+      <SignForm handleNickname={handleNickname} userName={userName}/>
+      <MessageList messages={messages}  />
       <SendMessage
-        connectionStatus
-        sendMessage={this.sendMessage}
-        cacheMessage={this.cacheMessage}
-        isUserSigned={this.state.isUserSigned}
-      />
+        connectionReadyState={connectionReadyState}
+        sendMessage={sendMessage}
+        cacheMessage={cacheMessage}
+        userName={userName} />
     </div>
   );
-
+  }
 }
 
 export default App;

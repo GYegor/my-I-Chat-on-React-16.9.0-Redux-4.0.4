@@ -4,26 +4,26 @@ class SignForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: ''
+      nameGetted: ''
     };
   }
 
-  inputToState = (text) => {
+  getName = (text) => {
     this.setState({
-      value: text,
+      nameGetted: text,
     });
   }
 
   submitNickname = (e) => {
     const { handleNickname } = this.props;
-    const message = this.state.value;
+    const { nameGetted } = this.state
     e.preventDefault();
-    handleNickname(message);
-    this.inputToState('');
+    handleNickname(nameGetted);
+    this.getName('');
   }
 
   render() {
-  const { userName, isUserSigned } = this.props
+  const { userName } = this.props
   const userSigned = (
     <>
       <p><b>You signed as:</b></p>
@@ -35,14 +35,14 @@ class SignForm extends Component {
   const userNotSigned = (
     <>
       <p><b>Enter your nickname </b></p>
-      <input type="text" value={this.state.value} onChange={e => this.inputToState(e.target.value)}/>
+      <input type="text" value={this.state.value} onChange={e => this.getName(e.target.value)}/>
       <input type="submit" value="Sign in"/>
     </>
   );
 
   return (
       <form className="sign-form" onSubmit={this.submitNickname}>
-        {isUserSigned ? userSigned : userNotSigned}
+        {userName ? userSigned : userNotSigned}
       </form>
     );
   }

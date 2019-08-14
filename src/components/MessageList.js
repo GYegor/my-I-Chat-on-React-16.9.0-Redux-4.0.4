@@ -4,16 +4,16 @@ import Message from './Message';
 class MessageList extends Component {
     render() {
     let list;
-    const { messageArr } = this.props;
+    const { messages } = this.props;
 
-    if (messageArr) {
-      list = messageArr.map(message => (<Message key={message.id} message={message}/>));
+    if (messages) {
+      list = messages.map(item => (<Message key={item.id} message={item}/>));
     }
 
     return (
       <ul className='message-list'>
-      {list}
-    </ul>
+        {list}
+      </ul>
     )
   }
 }
