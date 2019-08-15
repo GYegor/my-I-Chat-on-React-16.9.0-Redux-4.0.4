@@ -1,8 +1,33 @@
 /* eslint-disable react/prop-types */
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
+// import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { OPENED } from '../constants/connection-status';
 
-class SendMessage extends PureComponent {
+import {
+  sendMessage as sendMessageAction,
+  cacheMessage as cacheMessageAction,
+} from '../actions/chat-actions';
+
+const mapStateToProps = ({ userName, connectionReadyState, connection }) => (
+  {
+    userName,
+    connectionReadyState,
+    connection,
+  }
+);
+
+const mapDispatchToProps = (dispatch) => (
+  {
+    sendMessage:
+    (message, connection, userName) => dispatch(sendMessageAction(message, connection, userName)),
+    cacheMessage:
+    (message, userName) => dispatch(cacheMessageAction(message, userName)),
+  }
+);
+
+
+class SendMessageUI extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -49,5 +74,10 @@ class SendMessage extends PureComponent {
     );
   }
 }
+
+const SendMessage = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SendMessageUI);
 
 export default SendMessage;
