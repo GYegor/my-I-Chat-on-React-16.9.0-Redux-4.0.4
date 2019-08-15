@@ -1,5 +1,3 @@
-// import CHAT_WSS_PROXY_URL from '../constants/urls';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import customDateString from '../utils/customDateString';
 import { OPENED, CLOSED } from '../constants/connection-status';
 
@@ -55,29 +53,21 @@ export function onConnectionOpened(connection) {
     if (offlineMessages) {
       connection.send(offlineMessages);
       localStorage.removeItem('offlineMessages');
-      dispatch({ type: ON_CONNECTION_OPENED, connectionReadyState: OPENED });
     }
+    dispatch({ type: ON_CONNECTION_OPENED, connectionReadyState: OPENED });
   };
 }
-
 
 export function onConnectionClosed() {
-  return function middle(dispatch) {
-    const rws = new ReconnectingWebSocket('wss://wssproxy.herokuapp.com/');
-    // rws.addEventListener('open', handleOpening);
-    // rws.connection.addEventListener('message', handleGettingMessages);
-    // this.setState({
-    //   connection: rws,
-    //   connectionReadyState: CLOSED,
-    // });
-
-    // const { connection } = this.state;
-    // connection.addEventListener('open', this.onConnectionOpen);
-    // connection.addEventListener('message', this.onMessage);
-    dispatch({ type: ON_CONNECTION_CLOSED, connectionReadyState: CLOSED, connection: rws });
-  };
+  return { type: ON_CONNECTION_CLOSED, connectionReadyState: CLOSED };
 }
 
-export function onMessage({ data }) {
-  return { type: ON_MESSAGE, messages: JSON.parse(data).reverse() };
+
+export function onMessage(newData, messageIds) {
+  return function middle(dispatch) {
+    const recievedMessages = JSON.parse(newData);
+    const newMessages = recievedMessages.filter((message) => messageIds.indexOf(message.id) === -1);
+    const newIds = newMessages.map((message) => message.id);
+    dispatch({ type: ON_MESSAGE, messages: newMessages.reverse(), messageIds: newIds });
+  };
 }

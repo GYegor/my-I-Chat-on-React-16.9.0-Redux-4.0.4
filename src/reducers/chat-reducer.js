@@ -1,3 +1,4 @@
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import {
   SEND_MESSAGE,
   CACHE_MESSAGE,
@@ -10,7 +11,7 @@ import {
 import { CLOSED } from '../constants/connection-status';
 import { CHAT_WSS_PROXY_URL } from '../constants/urls';
 
-const connection = new WebSocket(CHAT_WSS_PROXY_URL);
+const connection = new ReconnectingWebSocket(CHAT_WSS_PROXY_URL);
 const connectionReadyState = CLOSED;
 const userName = localStorage.getItem('loggedAs');
 const messages = [];
@@ -47,7 +48,11 @@ export default function chatReducer(state = initialState, action) {
       };
     }
     case ON_MESSAGE: {
-      return { ...state, messages: [...state.messages, ...action.messages] };
+      return {
+        ...state,
+        messages: [...state.messages, ...action.messages],
+        messageIds: [...state.messageIds, ...action.messageIds],
+      };
     }
     default:
       return state;

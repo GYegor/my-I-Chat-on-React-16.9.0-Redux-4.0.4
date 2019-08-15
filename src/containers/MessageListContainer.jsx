@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+// import ReconnectingWebSocket from 'reconnecting-websocket';
 import {
   onConnectionOpened as onConnectionOpenedAction,
   onConnectionClosed as onConnectionClosedAction,
@@ -8,46 +9,38 @@ import {
 } from '../actions/chat-actions';
 import MessageList from '../components/MessageList';
 
-const mapStateToProps = ({ connection, messages }) => (
+const mapStateToProps = ({ connection, messages, messageIds }) => (
   {
     connection,
     messages,
+    messageIds,
   }
 );
 
 const mapDispatchToProps = (dispatch) => (
   {
     onConnectionOpened:
-    (connection, handleClosing) => dispatch(onConnectionOpenedAction(connection, handleClosing)),
+    (connection) => dispatch(onConnectionOpenedAction(connection)),
     onConnectionClosed:
-    (handleOpening) => dispatch(onConnectionClosedAction(handleOpening)),
+    (reconnectHandler) => dispatch(onConnectionClosedAction(reconnectHandler)),
     onMessage:
-    ({ data }) => dispatch(onMessageAction({ data })),
+    (newData, messageIds) => dispatch(onMessageAction(newData, messageIds)),
   }
 );
 
 class MessageListContainerUI extends Component {
-  constructor(props) {
-    super(props);
-    this.onConnectionOpened = this.props.onConnectionOpened.bind(this);
-    this.onConnectionClosed = this.props.onConnectionClosed.bind(this);
-    this.onMessage = this.props.onMessage.bind(this);
-  }
-
   componentDidMount() {
     const {
       connection,
-    } = this.props;
-
-    const {
+      messageIds,
       onConnectionOpened,
       onConnectionClosed,
       onMessage,
-    } = this;
+    } = this.props;
 
-    connection.addEventListener('open', () => onConnectionOpened(connection, onConnectionClosed));
+    connection.addEventListener('open', () => onConnectionOpened(connection));
     connection.addEventListener('close', () => onConnectionClosed(onConnectionOpened));
-    connection.addEventListener('message', onMessage);
+    connection.addEventListener('message', (event) => onMessage(event.data, messageIds));
   }
 
   componentDidUpdate() {
