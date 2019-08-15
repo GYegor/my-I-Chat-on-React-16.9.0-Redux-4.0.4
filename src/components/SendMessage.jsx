@@ -44,13 +44,20 @@ class SendMessageUI extends Component {
   }
 
   handleMessage(e) {
-    const { sendMessage, connectionReadyState, cacheMessage } = this.props;
+    const {
+      sendMessage,
+      cacheMessage,
+      connection,
+      connectionReadyState,
+      userName,
+    } = this.props;
+
     const { message } = this.state;
     e.preventDefault();
     if (connectionReadyState === OPENED) {
-      sendMessage(message);
+      sendMessage(message, connection, userName);
     } else {
-      cacheMessage(message);
+      cacheMessage(message, userName);
     }
     this.getMessage('');
   }
