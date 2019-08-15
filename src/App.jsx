@@ -4,7 +4,7 @@ import React from 'react';
 // import customDateString from './utils/customDateString';
 // import MessageList from './components/MessageList';
 import SignForm from './components/SignForm';
-import MessageListContainer from './containers/MessageListContainer';
+import ChatContainer from './containers/ChatContainer';
 import SendMessage from './components/SendMessage';
 // import ConnectionStatus from './components/ConnectionStatus';
 
@@ -17,9 +17,8 @@ import './assets/css/App.css';
 function App() {
   return (
     <div className="main">
-      {/* <ConnectionStatus connectionReadyState={connectionReadyState} /> */}
       <SignForm />
-      <MessageListContainer />
+      <ChatContainer />
       <SendMessage />
     </div>
   );

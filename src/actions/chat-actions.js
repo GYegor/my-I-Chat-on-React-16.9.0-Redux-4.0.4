@@ -54,7 +54,7 @@ export function onConnectionOpened(connection) {
       connection.send(offlineMessages);
       localStorage.removeItem('offlineMessages');
     }
-    dispatch({ type: ON_CONNECTION_OPENED, connectionReadyState: OPENED });
+    dispatch({ type: ON_CONNECTION_OPENED, connectionReadyState: OPENED, connection });
   };
 }
 

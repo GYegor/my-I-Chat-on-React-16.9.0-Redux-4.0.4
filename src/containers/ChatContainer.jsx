@@ -1,21 +1,28 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import ReconnectingWebSocket from 'reconnecting-websocket';
+
 import {
   onConnectionOpened as onConnectionOpenedAction,
   onConnectionClosed as onConnectionClosedAction,
   onMessage as onMessageAction,
 } from '../actions/chat-actions';
-import MessageList from '../components/MessageList';
 
-const mapStateToProps = ({ connection, messages, messageIds }) => (
-  {
-    connection,
-    messages,
-    messageIds,
-  }
-);
+import MessageList from '../components/MessageList';
+import ConnectionStatus from '../components/ConnectionStatus';
+
+
+const mapStateToProps = ({
+  connection,
+  connectionReadyState,
+  messages,
+  messageIds,
+}) => ({
+  connection,
+  connectionReadyState,
+  messages,
+  messageIds,
+});
 
 const mapDispatchToProps = (dispatch) => (
   {
@@ -28,7 +35,7 @@ const mapDispatchToProps = (dispatch) => (
   }
 );
 
-class MessageListContainerUI extends Component {
+class ChatContainerUI extends Component {
   componentDidMount() {
     const {
       connection,
@@ -48,17 +55,20 @@ class MessageListContainerUI extends Component {
   }
 
   render() {
-    const { messages } = this.props;
+    const { messages, connectionReadyState } = this.props;
     return (
-      <MessageList messages={messages} />
+      <>
+        <ConnectionStatus connectionReadyState={connectionReadyState} />
+        <MessageList messages={messages} />
+      </>
     );
   }
 }
 
 
-const MessageListContainer = connect(
+const ChatContainer = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(MessageListContainerUI);
+)(ChatContainerUI);
 
-export default MessageListContainer;
+export default ChatContainer;
