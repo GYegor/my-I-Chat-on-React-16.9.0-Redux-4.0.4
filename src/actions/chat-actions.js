@@ -5,7 +5,7 @@ import customDateString from '../utils/customDateString';
 export const SEND_MESSAGE = 'SEND_MESSAGE';
 export const CACHE_MESSAGE = 'CACHE_MESSAGE';
 
-export const TOGGLE_COMPLETE = 'TOGGLE_COMPLETE';
+export const HANDLE_NICKNAME = 'HANDLE_NICKNAME';
 export const DELETE_TODO = 'DELETE_TODO';
 export const REQUEST_TODOS = 'REQUEST_TODOS';
 export const RECEIVE_TODOS = 'RECEIVE_TODOS';
@@ -61,5 +61,12 @@ export function cacheMessage(message, userName) {
       localStorage.setItem('offlineMessages', JSON.stringify(allCachedMessages));
     }
     dispatch({ type: CACHE_MESSAGE });
+  };
+}
+
+export function handleNickname(text) {
+  return function middle(dispatch) {
+    localStorage.setItem('loggedAs', text);
+    dispatch({ type: HANDLE_NICKNAME, userName: text });
   };
 }

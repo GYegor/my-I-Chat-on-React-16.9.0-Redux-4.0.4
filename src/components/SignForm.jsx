@@ -1,7 +1,22 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
-class SignForm extends Component {
+import { handleNickname as handleNicknameAction } from '../actions/chat-actions';
+
+const mapStateToProps = ({ userName }) => (
+  {
+    userName,
+  }
+);
+
+const mapDispatchToProps = (dispatch) => (
+  {
+    handleNickname: (userName) => dispatch(handleNicknameAction(userName)),
+  }
+);
+
+class SignFormUI extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -51,5 +66,10 @@ class SignForm extends Component {
     );
   }
 }
+
+const SignForm = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SignFormUI);
 
 export default SignForm;
