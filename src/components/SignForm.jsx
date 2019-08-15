@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 
 class SignForm extends Component {
@@ -6,6 +7,8 @@ class SignForm extends Component {
     this.state = {
       nameGetted: '',
     };
+    this.getName = this.getName.bind(this);
+    this.submitNickname = this.submitNickname.bind(this);
   }
 
   getName(text) {
@@ -24,7 +27,6 @@ class SignForm extends Component {
 
   render() {
     const { userName } = this.props;
-    console.log(userName);
     const { nameGetted } = this.state;
     const userSigned = (
       <>

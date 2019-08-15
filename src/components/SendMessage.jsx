@@ -6,13 +6,15 @@ class SendMessage extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      value: '',
+      message: '',
     };
+    this.getMessage = this.getMessage.bind(this);
+    this.handleMessage = this.handleMessage.bind(this);
   }
 
-  inputToState(text) {
+  getMessage(text) {
     this.setState({
-      value: text,
+      message: text,
     });
   }
 
@@ -25,14 +27,14 @@ class SendMessage extends PureComponent {
     } else {
       cacheMessage(message);
     }
-    this.inputToState('');
+    this.getMessage('');
   }
 
   render() {
     const { userName } = this.props;
-    const { value } = this.state;
+    const { message } = this.state;
     const inputActive = (
-      <input className="input-massage active" type="text" placeholder="Write you message" value={value} onChange={(e) => this.inputToState(e.target.value)} />
+      <input className="input-massage active" type="text" placeholder="Write you message" value={message} onChange={(e) => this.getMessage(e.target.value)} />
     );
     const inputInactive = (
       <div className="input-massage inctive" />
