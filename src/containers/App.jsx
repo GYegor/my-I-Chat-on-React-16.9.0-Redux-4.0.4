@@ -2,16 +2,16 @@ import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 // import Websocket from 'react-websocket';
 import customDateString from '../utils/customDateString';
-import MessageList from './MessageList';
+import MessageList from '../components/MessageList';
 import SendMessage from './SendMessage';
 import SignForm from './SignForm';
-import ConnectionStatus from './ConnectionStatus';
+import ConnectionStatus from '../components/ConnectionStatus';
 
 import { CLOSED, OPENED } from '../constants/connection-status';
 import NOTIFICATION_VISIBILITY_TIMEOUT from '../constants/time-outs';
 
 
-import '../App.css';
+import '../assets/css/App.css';
 
 class App extends Component {
   static notify(newMessage) {
