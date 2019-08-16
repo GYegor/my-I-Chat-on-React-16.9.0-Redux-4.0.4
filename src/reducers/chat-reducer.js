@@ -43,6 +43,9 @@ export default function chatReducer(state = initialState, action) {
         connectionReadyState:
         action.connectionReadyState,
         connection: action.connection,
+        messages: action.messages,
+        messageIds: action.messageIds,
+
       };
     }
     case ON_CONNECTION_CLOSED: {
@@ -50,13 +53,16 @@ export default function chatReducer(state = initialState, action) {
         ...state,
         connectionReadyState: action.connectionReadyState,
         connection: action.connection,
+
       };
     }
     case ON_MESSAGE: {
+      const oldMessages = state.messages || [];
+      const oldMessageIds = state.messageIds || [];
       return {
         ...state,
-        messages: [...state.messages, ...action.messages],
-        messageIds: [...state.messageIds, ...action.messageIds],
+        messages: [...oldMessages, ...action.messages],
+        messageIds: [...oldMessageIds, ...action.messageIds],
       };
     }
     default:

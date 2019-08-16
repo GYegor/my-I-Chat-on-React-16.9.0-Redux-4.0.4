@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
 import {
   onConnectionOpened as onConnectionOpenedAction,
   onConnectionClosed as onConnectionClosedAction,
@@ -10,7 +9,6 @@ import {
 
 import MessageList from '../components/MessageList';
 import ConnectionStatus from '../components/ConnectionStatus';
-
 
 const mapStateToProps = ({
   connection,
@@ -31,23 +29,47 @@ const mapDispatchToProps = (dispatch) => (
     onConnectionClosed:
     (reconnectHandler) => dispatch(onConnectionClosedAction(reconnectHandler)),
     onMessage:
-    (newData, messageIds) => dispatch(onMessageAction(newData, messageIds)),
+    (newData, Ids, isWindowInactive) => dispatch(onMessageAction(newData,
+      Ids, isWindowInactive)),
   }
 );
 
 class ChatContainerUI extends Component {
+  constructor(props) {
+    super(props);
+    const {
+      connection,
+      messageIds,
+      isWindowInactive,
+      onConnectionOpened,
+      onConnectionClosed,
+      onMessage,
+    } = this.props;
+
+    this.connection = connection;
+    this.messageIds = messageIds;
+    this.isWindowInactive = isWindowInactive;
+    this.onConnectionOpened = onConnectionOpened.bind(this);
+    this.onMessage = onMessage.bind(this);
+    this.onConnectionClosed = onConnectionClosed.bind(this);
+  }
+
   componentDidMount() {
+    let isWindowInactive = false;
+    window.onfocus = () => { isWindowInactive = false; };
+    window.onblur = () => { isWindowInactive = true; };
+
     const {
       connection,
       messageIds,
       onConnectionOpened,
       onConnectionClosed,
       onMessage,
-    } = this.props;
-
+    } = this;
+    Notification.requestPermission();
     connection.addEventListener('open', () => onConnectionOpened(connection));
     connection.addEventListener('close', () => onConnectionClosed(onConnectionOpened));
-    connection.addEventListener('message', (event) => onMessage(event.data, messageIds));
+    connection.addEventListener('message', (event) => onMessage(event.data, messageIds, isWindowInactive));
   }
 
   componentDidUpdate() {
@@ -64,7 +86,6 @@ class ChatContainerUI extends Component {
     );
   }
 }
-
 
 const ChatContainer = connect(
   mapStateToProps,
