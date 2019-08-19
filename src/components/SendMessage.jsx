@@ -66,10 +66,10 @@ class SendMessageUI extends Component {
     const { userName } = this.props;
     const { message } = this.state;
     const inputActive = (
-      <input className="input-massage active" type="text" placeholder="Write you message" value={message} onChange={(e) => this.getMessage(e.target.value)} />
+      <input className="input-message active" type="text" placeholder="Write you message" value={message} onChange={(e) => this.getMessage(e.target.value)} />
     );
     const inputInactive = (
-      <div className="input-massage inctive" />
+      <div className="input-message" />
     );
 
     return (

@@ -6,6 +6,7 @@ import {
   onConnectionClosed as onConnectionClosedAction,
   onMessage as onMessageAction,
 } from '../actions/chat-actions';
+import { OPENED } from '../constants/connection-status';
 
 import MessageList from '../components/MessageList';
 import ConnectionStatus from '../components/ConnectionStatus';
@@ -15,11 +16,13 @@ const mapStateToProps = ({
   connectionReadyState,
   messages,
   messageIds,
+  userName,
 }) => ({
   connection,
   connectionReadyState,
   messages,
   messageIds,
+  userName,
 });
 
 const mapDispatchToProps = (dispatch) => (
@@ -77,11 +80,19 @@ class ChatContainerUI extends Component {
   }
 
   render() {
-    const { messages, connectionReadyState } = this.props;
+    const { messages, connectionReadyState, userName } = this.props;
+    let isConnected;
+
+    if (connectionReadyState === OPENED) {
+      isConnected = 'connected';
+    } else {
+      isConnected = 'connecting';
+    }
+
     return (
       <>
-        <ConnectionStatus connectionReadyState={connectionReadyState} />
-        <MessageList messages={messages} />
+        <ConnectionStatus connectionReadyState={connectionReadyState} className={isConnected} />
+        <MessageList messages={messages} userName={userName} />
       </>
     );
   }

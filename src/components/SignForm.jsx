@@ -46,16 +46,16 @@ class SignFormUI extends Component {
     const userSigned = (
       <>
         <p><b>You signed as:</b></p>
-        <p>{userName}</p>
-        <input type="submit" value="Sign out" />
+        <p className="sign-form-name">{userName}</p>
+        <input className="sign-form-button" type="submit" value="Sign out" />
       </>
     );
 
     const userNotSigned = (
       <>
         <p><b>Enter your nickname </b></p>
-        <input type="text" value={nameGetted} onChange={(e) => this.getName(e.target.value)} />
-        <input type="submit" value="Sign in" />
+        <input className="sign-form-input" type="text" value={nameGetted} onChange={(e) => this.getName(e.target.value)} />
+        <input className="sign-form-button" type="submit" value="Sign in" />
       </>
     );
 

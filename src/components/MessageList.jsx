@@ -2,12 +2,12 @@
 import React from 'react';
 import Message from './Message';
 
-function MessageList({ messages }) {
+function MessageList({ messages, userName }) {
   let list;
 
   if (messages) {
     list = messages
-      .map((item) => (<Message key={item.id} message={item} />));
+      .map((item) => (<Message key={item.id} message={item} userName={userName} />));
   }
 
   return (

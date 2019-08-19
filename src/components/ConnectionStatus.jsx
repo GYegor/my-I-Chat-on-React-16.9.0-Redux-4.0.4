@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 
-const ConnectionStatus = ({ connectionReadyState }) => (
-  <div className="connection-status">
-    {connectionReadyState}
+const ConnectionStatus = ({ connectionReadyState, className }) => (
+  <div className={`connection-status ${className}`}>
+    <b>{connectionReadyState}</b>
   </div>
 );
 
