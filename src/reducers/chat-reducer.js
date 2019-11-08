@@ -40,8 +40,7 @@ export default function chatReducer(state = initialState, action) {
     case ON_CONNECTION_OPENED: {
       return {
         ...state,
-        connectionReadyState:
-        action.connectionReadyState,
+        connectionReadyState: action.connectionReadyState,
         connection: action.connection,
         messages: action.messages,
         messageIds: action.messageIds,
